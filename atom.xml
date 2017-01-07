@@ -1,4 +1,28 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Stack Allocator在递归下降分析法中的运用 · morrow1nd</title><meta name="description" content="Stack Allocator在递归下降分析法中的运用 - morrow1nd"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/yinshi.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://morrow1nd.github.io/atom.xml" title="morrow1nd"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/yinshi.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">MORROW1ND</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://github.com/morrow1nd" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Stack Allocator在递归下降分析法中的运用</h1><div class="post-info">Jan 7, 2017</div><div class="post-content"><h2 id="Stack-Allocator"><a href="#Stack-Allocator" class="headerlink" title="Stack Allocator"></a>Stack Allocator</h2><p>Stack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：<strong>必须按照分配内存的顺序相反地依次释放内存</strong>。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内存的次数，从而极大地提高速度。</p>
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>morrow1nd</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://morrow1nd.github.io/"/>
+  <updated>2017-01-07T13:44:08.810Z</updated>
+  <id>https://morrow1nd.github.io/</id>
+  
+  <author>
+    <name>morrow1nd</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Stack Allocator在递归下降分析法中的运用</title>
+    <link href="https://morrow1nd.github.io/2017/01/07/Stack-Allocator%E5%9C%A8%E9%80%92%E5%BD%92%E4%B8%8B%E9%99%8D%E5%88%86%E6%9E%90%E6%B3%95%E4%B8%AD%E7%9A%84%E8%BF%90%E7%94%A8/"/>
+    <id>https://morrow1nd.github.io/2017/01/07/Stack-Allocator在递归下降分析法中的运用/</id>
+    <published>2017-01-07T12:04:50.000Z</published>
+    <updated>2017-01-07T13:44:08.810Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Stack-Allocator"><a href="#Stack-Allocator" class="headerlink" title="Stack Allocator"></a>Stack Allocator</h2><p>Stack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：<strong>必须按照分配内存的顺序相反地依次释放内存</strong>。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内存的次数，从而极大地提高速度。</p>
 <a id="more"></a>
 <h2 id="在递归下降分析法中的应用"><a href="#在递归下降分析法中的应用" class="headerlink" title="在递归下降分析法中的应用"></a>在递归下降分析法中的应用</h2><p><a href="https://en.wikipedia.org/wiki/Recursive_descent_parser" target="_blank" rel="external">递归下降分析法</a>是一种简单直白的文法分析方法，本文不会过多的介绍它的细节，更多信息请参考下面的额外链接。递归下降分析法为每一个非终结符建立相应的子程序（函数）,然后模拟语法树自动向下推导，在推导过程中遇到终结符则检查是否匹配，遇到非终结符则调用相应的子程序（函数）接着处理。下面列举选自<a href="https://github.com/morrow1nd/luax" target="_blank" rel="external">luax</a>的部分代码来说明为什么可以在递归下降分析法中使用stack allocator。</p>
 <p>文法片段：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">addtive_expr -&gt; </div><div class="line">          multiply_expr addtive_op addtive_expr</div><div class="line">        | multiply_expr</div><div class="line"></div><div class="line">multiply_expr -&gt;</div><div class="line">          prefix_expr multiply_op multiply_expr</div><div class="line">        | prefix_expr</div><div class="line"></div><div class="line">addtive_op -&gt;</div><div class="line">          &apos;+&apos;</div><div class="line">        | &apos;-&apos;</div><div class="line"></div><div class="line">multiply_op -&gt;</div><div class="line">          &apos;*&apos;</div><div class="line">        | &apos;/&apos;</div></pre></td></tr></table></figure></p>
@@ -30,4 +54,42 @@
 <li><a href="https://en.wikipedia.org/wiki/Recursive_descent_parser" target="_blank" rel="external">Recursive Descent Parser</a> - in wikipedia</li>
 <li><a href="http://teaching.idallen.com/cst8152/98w/recursive_decent_parsing.html" target="_blank" rel="external">How to turn a Grammar into C code</a> - a brief tutorial on implementing recursive descent parser</li>
 </ul>
-</div></article></div></main><footer><div class="paginator"><a href="/2017/01/07/hello-world/" class="next">下一篇</a></div><div class="copyright"><p>© 2017 <a href="https://morrow1nd.github.io">morrow1nd</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-6765a-1",'auto');ga('send','pageview');</script></body></html>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Stack-Allocator&quot;&gt;&lt;a href=&quot;#Stack-Allocator&quot; class=&quot;headerlink&quot; title=&quot;Stack Allocator&quot;&gt;&lt;/a&gt;Stack Allocator&lt;/h2&gt;&lt;p&gt;Stack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：&lt;strong&gt;必须按照分配内存的顺序相反地依次释放内存&lt;/strong&gt;。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内存的次数，从而极大地提高速度。&lt;/p&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://morrow1nd.github.io/2017/01/07/hello-world/"/>
+    <id>https://morrow1nd.github.io/2017/01/07/hello-world/</id>
+    <published>2017-01-07T10:51:37.583Z</published>
+    <updated>2017-01-07T10:51:37.583Z</updated>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>
