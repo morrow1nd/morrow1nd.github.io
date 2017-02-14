@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,29 +13,25 @@
 <meta property="og:site_name" content="morrow1nd">
 <meta property="og:description" content="前言 本文面向c++初学者，讲述现代c++语言中的资源管理，包含但不限于：资源获取即初始化(RAII), 智能指针，引用计数，weak_ptr的由来，垃圾回收机制。帮助c++初学者了解c++与c在资源管理上的不同，理解c++中的struct与c中的不同之处。并与具有完备的垃圾回收机制的语言进行对比。">
 <meta property="og:image" content="https://morrow1nd.github.io/images/引用计数-循环引用.png">
-<meta property="og:updated_time" content="2017-02-14T14:26:27.183Z">
+<meta property="og:updated_time" content="2017-02-14T15:27:46.444Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="cpp资源管理--智能指针、引用计数、weak_ptr">
 <meta name="twitter:description" content="前言 本文面向c++初学者，讲述现代c++语言中的资源管理，包含但不限于：资源获取即初始化(RAII), 智能指针，引用计数，weak_ptr的由来，垃圾回收机制。帮助c++初学者了解c++与c在资源管理上的不同，理解c++中的struct与c中的不同之处。并与具有完备的垃圾回收机制的语言进行对比。">
 <meta name="twitter:image" content="https://morrow1nd.github.io/images/引用计数-循环引用.png">
   
-    <link rel="alternate" href="/atom.xml" title="morrow1nd" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="morrow1nd" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
   
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
   <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
   
-
 </head>
-
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
+<div id="container">
+  <div id="wrap">
+    <header id="header">
   <div id="banner"></div>
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
@@ -51,6 +48,8 @@
         
           <a class="main-nav-link" href="/archives">Archives</a>
         
+          <a class="main-nav-link" href="/about">About</a>
+        
       </nav>
       <nav id="sub-nav">
         
@@ -59,13 +58,20 @@
         <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://morrow1nd.github.io"></form>
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="morrow1nd.github.io">
+        </form>
       </div>
     </div>
   </div>
 </header>
-      <div class="outer">
-        <section id="main"><article id="post-cpp资源管理-智能指针、引用计数、weak-ptr" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="outer">
+      <section id="main"><article id="post-cpp资源管理-智能指针、引用计数、weak-ptr" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/" class="article-date">
   <time datetime="2017-02-14T06:20:01.000Z" itemprop="datePublished">2017-02-14</time>
@@ -97,19 +103,19 @@
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">syncFromFile</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; filepath)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// 获取资源</span></div><div class="line">    FILE* fp = fopen(filepath.c_str(), <span class="string">"r"</span>);</div><div class="line">    <span class="keyword">if</span>(!fp)&#123;</div><div class="line">        ...</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="keyword">if</span>(handle(file.fp) == FAIL)&#123;</div><div class="line">        fclose(fp);</div><div class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(handle_second_step(file.fp) == FAIL)&#123;</div><div class="line">        fclose(fp);</div><div class="line">        <span class="keyword">return</span> <span class="number">-2</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(handle_third_step(file.fp) == FAIL)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="number">-3</span>; <span class="comment">// 忘记添加释放资源的代码了。当资源更多，函数更复杂，团队多人协作时，这种情况很可能发生。</span></div><div class="line">    &#125;</div><div class="line">    fclose(fp);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p> 下面是运用RAII的代码。RAII不仅仅可以用来管理内存，还可以用来管理锁、文件描述符、socket连接等等。这也是为什么本文的标题是资源管理而不是内存管理的原因。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> FileHandler </div><div class="line">&#123;</div><div class="line">    FILE* fp;</div><div class="line"></div><div class="line">    FileHandler(<span class="keyword">const</span> <span class="built_in">string</span>&amp; filepath)</div><div class="line">    &#123;</div><div class="line">        fp = fopen(filepath.c_str(), <span class="string">"r"</span>); </div><div class="line">        <span class="keyword">if</span>(fp == <span class="literal">NULL</span>)&#123;</div><div class="line">            ...</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    ~FileHandler()</div><div class="line">    &#123;</div><div class="line">        <span class="keyword">if</span>(fp) fclose(fp);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">// 代码非常简洁明了</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">syncFromFile</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; filepath)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="function">FileHandler <span class="title">file</span><span class="params">(filepath)</span></span>;</div><div class="line"></div><div class="line">    <span class="keyword">if</span>(handle(file.fp) == FAIL)</div><div class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">    <span class="keyword">if</span>(handle_second_step(file.fp) == FAIL)</div><div class="line">        <span class="keyword">return</span> <span class="number">-2</span>;</div><div class="line">    <span class="keyword">if</span>(handle_third_step(file.fp) == FAIL)</div><div class="line">        <span class="keyword">return</span> <span class="number">-3</span>;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="c-智能指针"><a href="#c-智能指针" class="headerlink" title="c++智能指针"></a>c++智能指针</h2><h4 id="auto-ptr"><a href="#auto-ptr" class="headerlink" title="auto_ptr"></a>auto_ptr</h4><p> 首先，我想说的是智能指针并不智能，不知道这是怎么取名的 :(。我们先来看看早期c++提供的智能指针 <code>auto_ptr</code>。早期c++只有这一个智能指针，功能是在被构造时传入一个指针，并且在析构时自动<code>delete</code>掉这个指针。下面是一个使用例子。</p>
+<h2 id="c-智能指针"><a href="#c-智能指针" class="headerlink" title="c++智能指针"></a>c++智能指针</h2><h3 id="auto-ptr"><a href="#auto-ptr" class="headerlink" title="auto_ptr"></a>auto_ptr</h3><p> 首先，我想说的是智能指针并不智能，不知道这是怎么取名的 :(。我们先来看看早期c++提供的智能指针 <code>auto_ptr</code>。早期c++只有这一个智能指针，功能是在被构造时传入一个指针，并且在析构时自动<code>delete</code>掉这个指针。下面是一个使用例子。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt;</span> <span class="comment">// auto_ptr needs this</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="keyword">struct</span> Foo &#123;</div><div class="line">    <span class="keyword">int</span> val;</div><div class="line">    Foo(<span class="keyword">int</span> val) : val(val) &#123;&#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">func</span><span class="params">(Foo* raw_pointer)</span> </span>&#123; ... &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">    <span class="built_in">auto_ptr</span>&lt;Foo&gt; fooh(<span class="keyword">new</span> Foo(<span class="number">123</span>));</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; fooh-&gt;val &lt;&lt; <span class="built_in">endl</span>; <span class="comment">// 就像使用一个原生指针一样: foop-&gt;val</span></div><div class="line">    fooh-&gt;val = <span class="number">321</span>;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; fooh-&gt;val &lt;&lt; <span class="built_in">endl</span>;</div><div class="line"></div><div class="line">    Foo* foop = fooh.get(); <span class="comment">// 获得raw pointer</span></div><div class="line">    func(foop);</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p> auto_ptr现在已被抛弃，不推荐使用，请使用它的替代品<a href="http://en.cppreference.com/w/cpp/memory/unique_ptr" target="_blank" rel="external">unique_ptr</a>。本文不深入介绍c++智能指针的所有方面，请参考<a href="http://www.cplusplus.com/reference/memory/" target="_blank" rel="external">cplusplus website</a>和<a href="http://en.cppreference.com/w/cpp/memory" target="_blank" rel="external">cppreference website</a>。</p>
-<h4 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h4><p> auto_ptr和unique_ptr在复制拷贝时，资源的所有权会变更，复制之后原先的就不能使用了。但如果我想让多个智能指针同时引用同一个指针时，又该怎么办呢？shared_ptr就是为解决这个问题而生的。如其所名(shared)，大家共享一个指针，共同管理一个资源。但此时问题来了，大家都引用一个指针，那怎么知道什么时候该释放这个指针呢？c++使用一个简单的机制来解决这个问题————<strong>引用计数</strong>。每当一个新的shared_ptr指向一个指针时，就增加1，当一个shared_ptr析构时，就减1，当计数的值为0时就释放这个指针。</p>
+<h3 id="shared-ptr"><a href="#shared-ptr" class="headerlink" title="shared_ptr"></a>shared_ptr</h3><p> auto_ptr和unique_ptr在复制拷贝时，资源的所有权会变更，复制之后原先的就不能使用了。但如果我想让多个智能指针同时引用同一个指针时，又该怎么办呢？shared_ptr就是为解决这个问题而生的。如其所名(shared)，大家共享一个指针，共同管理一个资源。但此时问题来了，大家都引用一个指针，那怎么知道什么时候该释放这个指针呢？c++使用一个简单的机制来解决这个问题————<strong>引用计数</strong>。每当一个新的shared_ptr指向一个指针时，就增加1，当一个shared_ptr析构时，就减1，当计数的值为0时就释放这个指针。</p>
 <p> 示例代码：(代码来自<a href="http://blog.csdn.net/sndaxdrs/article/details/6175701" target="_blank" rel="external">笑对人生的blog</a>, 有更改)</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">shared_ptr</span>&lt;<span class="keyword">int</span>&gt; sp(<span class="keyword">new</span> <span class="keyword">int</span>(<span class="number">10</span>));        <span class="comment">// 一个指向整数的shared_ptr</span></div><div class="line">sp.unique();                            <span class="comment">// unique() return true，现在shared_ptr是指针的唯一持有者</span></div><div class="line"><span class="built_in">shared_ptr</span>&lt;<span class="keyword">int</span>&gt; sp2 = sp;               <span class="comment">// 第二个shared_ptr，拷贝构造函数</span></div><div class="line">sp == sp2 &amp;&amp; sp.use_count() == <span class="number">2</span>;       <span class="comment">// 此表达式为真，两个shared_ptr相等，指向同一个对象，引用计数为2</span></div><div class="line">*sp2 = <span class="number">100</span>;                             <span class="comment">// 使用解引用操作符修改被指对象</span></div><div class="line"><span class="keyword">if</span>(*sp == <span class="number">100</span>)</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"sp也同时被修改"</span>;</div><div class="line">sp.reset();                             <span class="comment">// 停止sp对被指对象的引用</span></div><div class="line"><span class="keyword">if</span>(!sp &amp;&amp; sp2.use_count() == <span class="number">1</span>)</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"sp不再持有任何指针（空指针）"</span>;</div></pre></td></tr></table></figure>
 <p> shared_ptr的特性使得它可以代替原生的指针，我们可以方便的传递指针，并且不用担心资源管理的细节。在恰当的时候，基于引用计数的机制会帮我们释放指针。一切都很令人开心。就像下面例子中的使用方式。将下面代码中的所有<code>shared_ptr&lt;Foo&gt;</code>更换为<code>Foo*</code>，你会发现一切都正常。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">struct</span> Boo &#123;</div><div class="line">    <span class="built_in">string</span> str;</div><div class="line">    <span class="built_in">shared_ptr</span>&lt;Foo&gt; foo;</div><div class="line"></div><div class="line">    Boo(<span class="keyword">const</span> <span class="built_in">string</span>&amp; str, <span class="built_in">shared_ptr</span>&lt;Foo&gt; foo)</div><div class="line">        : str(str), foo(foo) &#123;&#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">shared_ptr</span>&lt;Foo&gt; createFoo(<span class="keyword">int</span> val);</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">doSomethingWithFoo</span><span class="params">(<span class="built_in">shared_ptr</span>&lt;Foo&gt; foo)</span></span>;</div><div class="line"></div><div class="line"><span class="built_in">shared_ptr</span>&lt;Boo&gt; func()</div><div class="line">&#123;</div><div class="line">    <span class="keyword">auto</span> foo = createFoo(<span class="number">123</span>);</div><div class="line">    doSomethingWithFoo(foo);</div><div class="line">    <span class="keyword">return</span> <span class="built_in">shared_ptr</span>&lt;Boo&gt;(<span class="keyword">new</span> Boo(<span class="string">"str"</span>, foo));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h4 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h4><p> 先让我们了解引用计数更多一点，你可能会想既然引用计数很完美，为什么java，javascript，lua需要复杂的垃圾回收机制？原因是引用计数存在<strong>循环引用</strong>的问题，考虑下面这个情景：</p>
+<h3 id="weak-ptr"><a href="#weak-ptr" class="headerlink" title="weak_ptr"></a>weak_ptr</h3><p> 先让我们了解引用计数更多一点，你可能会想既然引用计数很完美，为什么java，javascript，lua需要复杂的垃圾回收机制？原因是引用计数存在<strong>循环引用</strong>的问题，考虑下面这个情景：</p>
 <p> <img src="/images/引用计数-循环引用.png" alt="引用计数中的循环引用"></p>
 <p> 这种情况下，foo1的引用计数是2，一旦fooListHead不再引用foo1，此时foo1的引用计数将变为1，并且造成右边环形的三个对象永远不会被释放的问题。想要在每次解除引用时侦测是否有环形成是非常麻烦的事，所以提出了<strong>weak_ptr</strong>。weak_ptr在引用对象时，不增加引用计数值（所以叫虚引用）。既然不增加计数值，那么在引用之后，被指对象可能被释放了，所以不能直接读取weak_ptr中引用的对象。在使用对象之前必须先检查所引用的对象是否已经被释放，如果没有，则需要将引用计数值加1，然后访问此对象，访问完之后，再将引用计数值减1。由此可见，使用shared_ptr需要在必要的地方用weak_ptr代替shared_ptr。这项工作需要由程序员来手工管理，所以shared_ptr只是提供了有限的垃圾回收功能。</p>
 <h2 id="垃圾回收-c-java-javascript-lua"><a href="#垃圾回收-c-java-javascript-lua" class="headerlink" title="垃圾回收(c++, java, javascript, lua)"></a>垃圾回收(c++, java, javascript, lua)</h2><p> java, javascript, lua都使用复杂的垃圾回收机制来管理object，使得程序员从繁重的内存管理中解放出来。这些语言中的对象在没有地方引用它们时，在一定的时候就会被垃圾回收机制处理掉。如何跟踪这些unreachable objects，是垃圾回收的主要任务，了解<a href="http://www.memorymanagement.org/mmref/recycle.html#tracing-collectors" target="_blank" rel="external">相关的算法</a>。</p>
-<h4 id="Garbage-Collection-in-c"><a href="#Garbage-Collection-in-c" class="headerlink" title="Garbage Collection in c++"></a>Garbage Collection in c++</h4><p> 设想一下，一个c++库提供垃圾回收的能力，它实现了一个object wrapper。这个object wrapper是一个类似shared_ptr的智能指针，我们暂且叫它smart_ptr。smart_ptr不使用引用计数来管理它引用的对象，它使用一个真正的垃圾回收算法。如果我们约定不在代码中传递指针和new运算符，而总是传递smart_ptr和使用new_smart_ptr函数来代替new运算符，并且new_smart_ptr总是返回一个smart_ptr，在不考虑性能的情况下，那么我们可以获得和java, javascript等语言一样的内存自动管理能力。我们永远不需要手动地编写代码来释放内存。</p>
+<h3 id="Garbage-Collection-in-c"><a href="#Garbage-Collection-in-c" class="headerlink" title="Garbage Collection in c++"></a>Garbage Collection in c++</h3><p> 设想一下，一个c++库提供垃圾回收的能力，它实现了一个object wrapper。这个object wrapper是一个类似shared_ptr的智能指针，我们暂且叫它smart_ptr。smart_ptr不使用引用计数来管理它引用的对象，它使用一个真正的垃圾回收算法。如果我们约定不在代码中传递指针和new运算符，而总是传递smart_ptr和使用new_smart_ptr函数来代替new运算符，并且new_smart_ptr总是返回一个smart_ptr，在不考虑性能的情况下，那么我们可以获得和java, javascript等语言一样的内存自动管理能力。我们永远不需要手动地编写代码来释放内存。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div><div class="line"><span class="keyword">struct</span> smart_ptr</div><div class="line">&#123;</div><div class="line">    ...</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">class</span>... Args&gt;</div><div class="line">smart_ptr&lt;T&gt; new_smart_ptr(Args &amp;&amp;...args) &#123; ... &#125;</div><div class="line"></div><div class="line"></div><div class="line">smart_ptr&lt;<span class="keyword">int</span>&gt; example()</div><div class="line">&#123;</div><div class="line">    &#123;</div><div class="line">        smart_ptr&lt;Foo&gt; foo = new_smart_ptr&lt;Foo&gt;(<span class="number">123</span>);</div><div class="line">    &#125;</div><div class="line">    smart_ptr&lt;Foo&gt; foo = new_smart_ptr&lt;Foo&gt;(<span class="number">321</span>);</div><div class="line">    str = smart_ptr_null; <span class="comment">// 使用smart_ptr_null代替nullptr</span></div><div class="line">                          <span class="comment">// 之前分配的对象将被回收掉</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p> 现在联系前面的一节 <em>c++中的struct/class</em> 中关于c与c++的对比，考虑一下，使用c语言能够实现上面的能力吗？</p>
 <h2 id="额外链接"><a href="#额外链接" class="headerlink" title="额外链接"></a>额外链接</h2><ul>
@@ -121,8 +127,14 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://morrow1nd.github.io/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/" data-id="ciz5mrz5n00044givep4vgnzg" class="article-share-link">Share</a>
       
+        <a data-url="https://morrow1nd.github.io/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/" data-id="ciz5pkd6p000090ivf66wp35u" class="article-share-link" data-share="baidu" data-title="cpp资源管理--智能指针、引用计数、weak_ptr">分享到</a>
+      
+
+      
+        <a href="https://morrow1nd.github.io/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/#ds-thread" class="article-comment-link">评论</a>
+      
+
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cpp/">cpp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/内存管理/">内存管理</a></li></ul>
 
@@ -134,7 +146,7 @@
   
   
     <a href="/2017/01/07/Stack-Allocator在递归下降分析法中的运用/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
+      <strong class="article-nav-caption">上一篇</strong>
       <div class="article-nav-title">Stack Allocator在递归下降分析法中的运用</div>
     </a>
   
@@ -143,26 +155,28 @@
   
 </article>
 
+
+  <section id="comments">
+    <div id="ds-thread" class="ds-thread" data-thread-key="2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/" data-title="cpp资源管理--智能指针、引用计数、weak_ptr" data-url="https://morrow1nd.github.io/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/"></div>
+  </section>
 </section>
-        
-          <aside id="sidebar">
+      
+      <aside id="sidebar">
   
     
-
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
+    <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/cpp/">cpp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/解释器/">解释器</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/cpp/">cpp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/解释器/">解释器</a><span class="tag-list-count">1</span></li></ul>
     </div>
   </div>
 
-
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
+    <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
       <a href="/tags/cpp/" style="font-size: 10px;">cpp</a> <a href="/tags/内存管理/" style="font-size: 20px;">内存管理</a> <a href="/tags/解释器/" style="font-size: 10px;">解释器</a>
     </div>
@@ -171,17 +185,16 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">一月 2017</a><span class="archive-list-count">2</span></li></ul>
     </div>
   </div>
-
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
         
@@ -202,37 +215,98 @@
   </div>
 
   
-</aside>
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
         
-      </div>
-      <footer id="footer">
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
   
   <div class="outer">
     <div id="footer-info" class="inner">
       &copy; 2017 morrow1nd<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
     </div>
   </div>
 </footer>
-    </div>
-    <nav id="mobile-nav">
+  </div>
+  <nav id="mobile-nav">
   
     <a href="/" class="mobile-nav-link">Home</a>
   
     <a href="/archives" class="mobile-nav-link">Archives</a>
   
+    <a href="/about" class="mobile-nav-link">About</a>
+  
 </nav>
-    
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<!-- totop end -->
+
+<!-- 多说公共js代码 start -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"morrow1nd"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- 多说公共js代码 end -->
 
 
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
 
 
 <script src="/js/script.js"></script>
 
-  </div>
+</div>
 </body>
 </html>
