@@ -1,4 +1,91 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Stack Allocator在递归下降分析法中的运用 · morrow1nd</title><meta name="description" content="Stack Allocator在递归下降分析法中的运用 - morrow1nd"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/yinshi.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://morrow1nd.github.io/atom.xml" title="morrow1nd"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/yinshi.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">MORROW1ND</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://github.com/morrow1nd" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/about/" target="_self" class="nav-list-link">ABOUT</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Stack Allocator在递归下降分析法中的运用</h1><div class="post-info">Jan 7, 2017</div><div class="post-content"><h2 id="Stack-Allocator"><a href="#Stack-Allocator" class="headerlink" title="Stack Allocator"></a>Stack Allocator</h2><p>Stack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：<strong>必须按照分配内存的顺序相反地依次释放内存</strong>。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内存的次数，从而极大地提高速度。</p>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Stack Allocator在递归下降分析法中的运用 | morrow1nd</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Stack AllocatorStack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：必须按照分配内存的顺序相反地依次释放内存。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Stack Allocator在递归下降分析法中的运用">
+<meta property="og:url" content="https://morrow1nd.github.io/2017/01/07/Stack-Allocator在递归下降分析法中的运用/index.html">
+<meta property="og:site_name" content="morrow1nd">
+<meta property="og:description" content="Stack AllocatorStack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：必须按照分配内存的顺序相反地依次释放内存。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内">
+<meta property="og:updated_time" content="2017-02-14T06:36:56.220Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Stack Allocator在递归下降分析法中的运用">
+<meta name="twitter:description" content="Stack AllocatorStack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：必须按照分配内存的顺序相反地依次释放内存。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内">
+  
+    <link rel="alternate" href="/atom.xml" title="morrow1nd" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">morrow1nd</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://morrow1nd.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Stack-Allocator在递归下降分析法中的运用" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/01/07/Stack-Allocator在递归下降分析法中的运用/" class="article-date">
+  <time datetime="2017-01-07T12:04:50.000Z" itemprop="datePublished">2017-01-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Stack Allocator在递归下降分析法中的运用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Stack-Allocator"><a href="#Stack-Allocator" class="headerlink" title="Stack Allocator"></a>Stack Allocator</h2><p>Stack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：<strong>必须按照分配内存的顺序相反地依次释放内存</strong>。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内存的次数，从而极大地提高速度。</p>
 <a id="more"></a>
 <h2 id="在递归下降分析法中的应用"><a href="#在递归下降分析法中的应用" class="headerlink" title="在递归下降分析法中的应用"></a>在递归下降分析法中的应用</h2><p><a href="https://en.wikipedia.org/wiki/Recursive_descent_parser" target="_blank" rel="external">递归下降分析法</a>是一种简单直白的文法分析方法，本文不会过多的介绍它的细节，更多信息请参考下面的额外链接。递归下降分析法为每一个非终结符建立相应的子程序（函数）,然后模拟语法树自动向下推导，在推导过程中遇到终结符则检查是否匹配，遇到非终结符则调用相应的子程序（函数）接着处理。下面列举选自<a href="https://github.com/morrow1nd/luax" target="_blank" rel="external">luax</a>的部分代码来说明为什么可以在递归下降分析法中使用stack allocator。</p>
 <p>文法片段：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">addtive_expr -&gt; </div><div class="line">          multiply_expr addtive_op addtive_expr</div><div class="line">        | multiply_expr</div><div class="line"></div><div class="line">multiply_expr -&gt;</div><div class="line">          prefix_expr multiply_op multiply_expr</div><div class="line">        | prefix_expr</div><div class="line"></div><div class="line">addtive_op -&gt;</div><div class="line">          &apos;+&apos;</div><div class="line">        | &apos;-&apos;</div><div class="line"></div><div class="line">multiply_op -&gt;</div><div class="line">          &apos;*&apos;</div><div class="line">        | &apos;/&apos;</div></pre></td></tr></table></figure></p>
@@ -30,4 +117,131 @@
 <li><a href="https://en.wikipedia.org/wiki/Recursive_descent_parser" target="_blank" rel="external">Recursive Descent Parser</a> - in wikipedia</li>
 <li><a href="http://teaching.idallen.com/cst8152/98w/recursive_decent_parsing.html" target="_blank" rel="external">How to turn a Grammar into C code</a> - a brief tutorial on implementing recursive descent parser</li>
 </ul>
-</div></article></div></main><footer><div class="paginator"><a href="/2017/01/07/hello-world/" class="next">下一篇</a></div><div class="copyright"><p>© 2017 <a href="https://morrow1nd.github.io">morrow1nd</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-6765a-1",'auto');ga('send','pageview');</script></body></html>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://morrow1nd.github.io/2017/01/07/Stack-Allocator在递归下降分析法中的运用/" data-id="ciz5hygrr000054ivlb33m9a9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/memory-management-解释器/">memory management, 解释器</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          cpp资源管理--智能指针、引用计数、weak_ptr
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/01/07/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory-management-cpp/">memory management, cpp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory-management-解释器/">memory management, 解释器</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/memory-management-cpp/" style="font-size: 10px;">memory management, cpp</a> <a href="/tags/memory-management-解释器/" style="font-size: 10px;">memory management, 解释器</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/">cpp资源管理--智能指针、引用计数、weak_ptr</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/07/Stack-Allocator在递归下降分析法中的运用/">Stack Allocator在递归下降分析法中的运用</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/07/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 morrow1nd<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

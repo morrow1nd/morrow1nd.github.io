@@ -3,14 +3,21 @@
 <head>
   <meta charset="utf-8">
   
-  <title>morrow1nd</title>
+  <title>cpp资源管理--智能指针、引用计数、weak_ptr | morrow1nd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="morrow1nd">
-<meta property="og:url" content="https://morrow1nd.github.io/index.html">
+  <meta name="description" content="前言 本文面向c++初学者，讲述现代c++语言中的资源管理，包含但不限于：资源获取即初始化(RAII), 智能指针，引用计数，weak_ptr的由来，垃圾回收机制。帮助c++初学者了解c++与c在资源管理上的不同，理解c++中的struct与c中的不同之处。并与其它语言进行对比（java, javascript, lua）。
+c++中的struct/class 正确且全面的掌握class是理解和使">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cpp资源管理--智能指针、引用计数、weak_ptr">
+<meta property="og:url" content="https://morrow1nd.github.io/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/index.html">
 <meta property="og:site_name" content="morrow1nd">
+<meta property="og:description" content="前言 本文面向c++初学者，讲述现代c++语言中的资源管理，包含但不限于：资源获取即初始化(RAII), 智能指针，引用计数，weak_ptr的由来，垃圾回收机制。帮助c++初学者了解c++与c在资源管理上的不同，理解c++中的struct与c中的不同之处。并与其它语言进行对比（java, javascript, lua）。
+c++中的struct/class 正确且全面的掌握class是理解和使">
+<meta property="og:updated_time" content="2017-02-14T12:18:37.682Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="morrow1nd">
+<meta name="twitter:title" content="cpp资源管理--智能指针、引用计数、weak_ptr">
+<meta name="twitter:description" content="前言 本文面向c++初学者，讲述现代c++语言中的资源管理，包含但不限于：资源获取即初始化(RAII), 智能指针，引用计数，weak_ptr的由来，垃圾回收机制。帮助c++初学者了解c++与c在资源管理上的不同，理解c++中的struct与c中的不同之处。并与其它语言进行对比（java, javascript, lua）。
+c++中的struct/class 正确且全面的掌握class是理解和使">
   
     <link rel="alternate" href="/atom.xml" title="morrow1nd" type="application/atom+xml">
   
@@ -59,9 +66,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-cpp资源管理-智能指针、引用计数、weak-ptr" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-cpp资源管理-智能指针、引用计数、weak-ptr" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/" class="article-date">
   <time datetime="2017-02-14T06:20:01.000Z" itemprop="datePublished">2017-02-14</time>
@@ -74,8 +79,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/02/14/cpp资源管理-智能指针、引用计数、weak-ptr/">cpp资源管理--智能指针、引用计数、weak_ptr</a>
+    <h1 class="article-title" itemprop="name">
+      cpp资源管理--智能指针、引用计数、weak_ptr
     </h1>
   
 
@@ -110,98 +115,19 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-Stack-Allocator在递归下降分析法中的运用" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/01/07/Stack-Allocator在递归下降分析法中的运用/" class="article-date">
-  <time datetime="2017-01-07T12:04:50.000Z" itemprop="datePublished">2017-01-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/01/07/Stack-Allocator在递归下降分析法中的运用/">Stack Allocator在递归下降分析法中的运用</a>
-    </h1>
+    <a href="/2017/01/07/Stack-Allocator在递归下降分析法中的运用/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Stack Allocator在递归下降分析法中的运用</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="Stack-Allocator"><a href="#Stack-Allocator" class="headerlink" title="Stack Allocator"></a>Stack Allocator</h2><p>Stack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：<strong>必须按照分配内存的顺序相反地依次释放内存</strong>。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内存的次数，从而极大地提高速度。</p>
-        
-          <p class="article-more-link">
-            <a href="/2017/01/07/Stack-Allocator在递归下降分析法中的运用/#more">Read More</a>
-          </p>
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://morrow1nd.github.io/2017/01/07/Stack-Allocator在递归下降分析法中的运用/" data-id="ciz5hygrr000054ivlb33m9a9" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/memory-management-解释器/">memory management, 解释器</a></li></ul>
-
-    </footer>
-  </div>
   
 </article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/01/07/hello-world/" class="article-date">
-  <time datetime="2017-01-07T10:51:37.583Z" itemprop="datePublished">2017-01-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/01/07/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://morrow1nd.github.io/2017/01/07/hello-world/" data-id="ciz5hygrr000254ivfc5c9l7w" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 </section>
         
