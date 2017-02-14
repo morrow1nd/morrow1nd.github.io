@@ -11,7 +11,7 @@
 <meta property="og:url" content="https://morrow1nd.github.io/2017/01/07/Stack-Allocator在递归下降分析法中的运用/index.html">
 <meta property="og:site_name" content="morrow1nd">
 <meta property="og:description" content="Stack AllocatorStack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：必须按照分配内存的顺序相反地依次释放内存。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内">
-<meta property="og:updated_time" content="2017-02-14T06:36:56.220Z">
+<meta property="og:updated_time" content="2017-02-14T14:08:01.731Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Stack Allocator在递归下降分析法中的运用">
 <meta name="twitter:description" content="Stack AllocatorStack allocator是一种在栈上动态分配内存的内存管理机制，它能够提供和使用局部变量相近的速度，并且不用考虑内存碎片化的问题。但它有一个特点：必须按照分配内存的顺序相反地依次释放内存。由于这一特点，我们更多的只是在一个函数中使用它分配内存并在函数返回前释放掉内存。在某些需要动态分配内存的递归函数中，使用stack allocator能够极大地减少向系统请求内">
@@ -121,10 +121,10 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://morrow1nd.github.io/2017/01/07/Stack-Allocator在递归下降分析法中的运用/" data-id="ciz5hygrr000054ivlb33m9a9" class="article-share-link">Share</a>
+      <a data-url="https://morrow1nd.github.io/2017/01/07/Stack-Allocator在递归下降分析法中的运用/" data-id="ciz5mn6oi0000xkiv8v9hp16u" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/memory-management-解释器/">memory management, 解释器</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/解释器/">解释器</a></li></ul>
 
     </footer>
   </div>
@@ -163,7 +163,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory-management-cpp/">memory management, cpp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory-management-解释器/">memory management, 解释器</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/cpp/">cpp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存管理/">内存管理</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/解释器/">解释器</a></li></ul>
     </div>
   </div>
 
@@ -173,7 +173,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/memory-management-cpp/" style="font-size: 10px;">memory management, cpp</a> <a href="/tags/memory-management-解释器/" style="font-size: 10px;">memory management, 解释器</a>
+      <a href="/tags/cpp/" style="font-size: 10px;">cpp</a> <a href="/tags/内存管理/" style="font-size: 20px;">内存管理</a> <a href="/tags/解释器/" style="font-size: 10px;">解释器</a>
     </div>
   </div>
 
