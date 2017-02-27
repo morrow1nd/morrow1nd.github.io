@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>morrow1nd</title>
-  
+  <title>Morrow1nd&#39;s Blog</title>
+  <subtitle>Code the World!</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://morrow1nd.github.io/"/>
@@ -9,8 +9,8 @@
   <id>https://morrow1nd.github.io/</id>
   
   <author>
-    <name>morrow1nd</name>
-    
+    <name>Morrow1nd</name>
+    <email>morrow1nd@yahoo.com</email>
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
