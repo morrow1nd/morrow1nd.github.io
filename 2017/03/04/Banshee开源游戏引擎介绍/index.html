@@ -97,14 +97,14 @@
 
                         
                         <li>
-                            <a href="/archives/">Archives</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/archives/">Archives</a>
                         </li>
                         
                     
@@ -233,6 +233,8 @@
 <li>GUI</li>
 </ul>
 <h2 id="引擎架构"><a href="#引擎架构" class="headerlink" title="引擎架构"></a>引擎架构</h2><p><img src="/images/BansheeArchitectureSimple.png" alt="BansheeArchitectureSimple"></p>
+<p align="center"><sup>图片来源自官方文档</sup></p>
+
 <p> 整个引擎分四层: Utility, Core, Engine, Editor。Utility层提供跨平台的线程、文件系统存取、事件机制、数学库、c++反射。Core层提供整个引擎各模块的接口（虚基类），供上层调用。Engine层使用Core层的接口实现一些基本的功能，如GUI、脚本。Editor层实现和编辑器相关的功能，Editor层的主要部分是使用C#脚本实现的。具体细节见<a href="http://docs.banshee3d.com/Native/architecture.html" target="_blank" rel="external">官方文档</a>。</p>
 <p> 除了以上四层架构外，还有一项很重要的设计：插件。Core层的接口都是在插件中实现的，上图中的黑色块就是插件。</p>
 <h2 id="开发进度"><a href="#开发进度" class="headerlink" title="开发进度"></a>开发进度</h2><p> Banshee的源码托管在GitHub上，主要开发者只有原作者一个人。目前正在添加PBR的功能。Banshee到现在只发布了v0.4，预计在2017年推出1.0版本。Banshee的源码不稳定，各种Bug层出不穷，目前想直接使用Banshee开发游戏是不太可能的。</p>

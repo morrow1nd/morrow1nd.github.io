@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://morrow1nd.github.io/"/>
-  <updated>2017-03-04T06:45:55.433Z</updated>
+  <updated>2017-03-04T06:56:32.871Z</updated>
   <id>https://morrow1nd.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://morrow1nd.github.io/2017/03/04/Banshee%E5%BC%80%E6%BA%90%E6%B8%B8%E6%88%8F%E5%BC%95%E6%93%8E%E4%BB%8B%E7%BB%8D/"/>
     <id>https://morrow1nd.github.io/2017/03/04/Banshee开源游戏引擎介绍/</id>
     <published>2017-03-04T05:17:44.000Z</published>
-    <updated>2017-03-04T06:45:55.433Z</updated>
+    <updated>2017-03-04T06:56:32.871Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>Banshee是高质量的现代游戏开发工具链，它是使用C++14写成的高性能多线程游戏引擎，支持2D和3D游戏开发。引擎支持Vulkan、DirectX11和OpenGL，支持跨平台输入、GUI、物理引擎、audio、动画、脚本以及其他通用的资源格式(FBX, PNG, PSD, TTF, OGG, WAV).<br>在引擎之上，Banshee提供直观且可定制化的编辑器，便于美术、设计师、程序的使用。编辑器允许你管理整个项目的资源、脚本、测试和发布游戏。编辑器允许开发者通过脚本扩充功能。</p>
@@ -64,6 +64,8 @@
 <li>GUI</li>
 </ul>
 <h2 id="引擎架构"><a href="#引擎架构" class="headerlink" title="引擎架构"></a>引擎架构</h2><p><img src="/images/BansheeArchitectureSimple.png" alt="BansheeArchitectureSimple"></p>
+<p align="center"><sup>图片来源自官方文档</sup></p>
+
 <p> 整个引擎分四层: Utility, Core, Engine, Editor。Utility层提供跨平台的线程、文件系统存取、事件机制、数学库、c++反射。Core层提供整个引擎各模块的接口（虚基类），供上层调用。Engine层使用Core层的接口实现一些基本的功能，如GUI、脚本。Editor层实现和编辑器相关的功能，Editor层的主要部分是使用C#脚本实现的。具体细节见<a href="http://docs.banshee3d.com/Native/architecture.html" target="_blank" rel="external">官方文档</a>。</p>
 <p> 除了以上四层架构外，还有一项很重要的设计：插件。Core层的接口都是在插件中实现的，上图中的黑色块就是插件。</p>
 <h2 id="开发进度"><a href="#开发进度" class="headerlink" title="开发进度"></a>开发进度</h2><p> Banshee的源码托管在GitHub上，主要开发者只有原作者一个人。目前正在添加PBR的功能。Banshee到现在只发布了v0.4，预计在2017年推出1.0版本。Banshee的源码不稳定，各种Bug层出不穷，目前想直接使用Banshee开发游戏是不太可能的。</p>
