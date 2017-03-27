@@ -1,7 +1,7 @@
 # 基本光照
 
 ![4 compare](4.png)
-<p align="center">Phong逐顶点 - Phong逐顶点 - HalfLambert - BlinnPhong</p>
+<p align="center">Phong逐顶点 - Phong逐像素 - HalfLambert - BlinnPhong</p>
 
 
 ## Phone光照模型

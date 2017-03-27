@@ -16,3 +16,6 @@
 见BumpMapping.shader
 
 ![bump](bump.png)
+
+
+## 渐变纹理
