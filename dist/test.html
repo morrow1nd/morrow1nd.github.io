@@ -6,11 +6,12 @@
     import http from 'https://unpkg.com/isomorphic-git@beta/http/web/index.js'
     const fs = new LightningFS('fs')
 
-    const dir = '/test-clone3'
+    const dir = '/test-clone4'
     git.clone({
         fs, http, dir, 
-        url: 'https://justcors.com/tl_7e97dbb/https://github.com/isomorphic-git/lightning-fs.git',
-        //corsProxy: 'https://cors.isomorphic-git.org'
+        //url: 'https://justcors.com/tl_7e97dbb/https://github.com/isomorphic-git/lightning-fs.git',
+        url: 'https://github.com/isomorphic-git/lightning-fs.git',
+        corsProxy: 'https://cors.isomorphic-git.org'
     })
         .then(console.log)
 </script>
